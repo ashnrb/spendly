@@ -8,7 +8,7 @@ Built with React, Express, and MySQL.
 **Live demo:** _coming soon_
 
 <!-- Replace with a real screenshot/GIF once you have one -->
-![Spendly dashboard](docs/dashboard.png)
+![Spendly dashboard](SS/1.dashboard.png)
 
 ---
 
