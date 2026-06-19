@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useSettings } from '../SettingsContext';
 import { getPeriod, shiftPeriod, inPeriod, periodLabel, toInputDate } from '../periods';
 
+const API = import.meta.env.VITE_API_URL;
+
 function History() {
   const { defaultPeriod, formatMoney } = useSettings();
   const periodType = defaultPeriod;
@@ -9,11 +11,11 @@ function History() {
   const [expenses, setExpenses] = useState([]);
   const [income, setIncome] = useState([]);
   const [expandedKey, setExpandedKey] = useState(null);
-  const [count, setCount] = useState(8); // how many past periods to show
+  const [count, setCount] = useState(8);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/expenses').then((r) => r.json()).then(setExpenses).catch(console.error);
-    fetch('http://localhost:5000/api/income').then((r) => r.json()).then(setIncome).catch(console.error);
+    fetch(`${API}/api/expenses`).then((r) => r.json()).then(setExpenses).catch(console.error);
+    fetch(`${API}/api/income`).then((r) => r.json()).then(setIncome).catch(console.error);
   }, []);
 
   function spentFor(period) {
@@ -31,7 +33,6 @@ function History() {
     return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
   }
 
-  // Build the list of periods: current, then back `count` periods
   const current = getPeriod(new Date(), periodType);
   const periods = [];
   let cursor = current;

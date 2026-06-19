@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useSettings } from '../SettingsContext';
 
+const API = import.meta.env.VITE_API_URL;
+
 function Profile() {
   const { name, defaultPeriod, currency, currencyOptions, theme, toggleTheme, saveSettings, loaded } = useSettings();
 
@@ -9,7 +11,6 @@ function Profile() {
   const [currencyInput, setCurrencyInput] = useState(currency);
   const [savedMsg, setSavedMsg] = useState(false);
 
-  // When settings finish loading from the DB, fill the form
   useEffect(() => {
     setNameInput(name);
     setPeriodInput(defaultPeriod);
@@ -24,7 +25,7 @@ function Profile() {
 
   function handleReset() {
     if (!window.confirm('This permanently deletes ALL expenses and income. Continue?')) return;
-    fetch('http://localhost:5000/api/reset', { method: 'POST' })
+    fetch(`${API}/api/reset`, { method: 'POST' })
       .then((res) => res.json())
       .then(() => window.alert('All data cleared. Refresh other pages to see the change.'))
       .catch((err) => console.error('Error clearing data:', err));

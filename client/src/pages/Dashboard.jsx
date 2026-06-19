@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useSettings } from '../SettingsContext';
 import { getPeriod, shiftPeriod, inPeriod, periodLabel, toInputDate } from '../periods';
 
+const API = import.meta.env.VITE_API_URL;
+
 function Dashboard() {
   const { name, defaultPeriod, formatMoney, symbol } = useSettings();
   const periodType = defaultPeriod;
@@ -10,8 +12,8 @@ function Dashboard() {
   const [income, setIncome] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/expenses').then((r) => r.json()).then(setExpenses).catch(console.error);
-    fetch('http://localhost:5000/api/income').then((r) => r.json()).then(setIncome).catch(console.error);
+    fetch(`${API}/api/expenses`).then((r) => r.json()).then(setExpenses).catch(console.error);
+    fetch(`${API}/api/income`).then((r) => r.json()).then(setIncome).catch(console.error);
   }, []);
 
   function spentFor(period) {
@@ -66,17 +68,14 @@ function Dashboard() {
   const firstName = name ? name.trim().split(' ')[0] : '';
   const unitWord = periodType === 'monthly' ? 'month' : periodType === 'fortnightly' ? 'fortnight' : 'week';
 
-  // Blob sizing — diameter scales with value
   const vmax = Math.max(curIncome, curSpent, Math.abs(saved), 1);
   const blobSize = (v) => 110 + (Math.abs(v) / vmax) * 150;
 
-  // Radial gauge (budget used)
   const gaugePct = spentPct === null ? 0 : Math.min(spentPct, 100);
   const R = 54;
   const CIRC = 2 * Math.PI * R;
   const dash = (gaugePct / 100) * CIRC;
 
-  // Segmented bar: how many of 14 segments to fill for a category
   const SEG = 14;
   const segFilled = (total) => {
     if (curSpent <= 0 || total <= 0) return 0;
@@ -94,7 +93,6 @@ function Dashboard() {
       </header>
 
       <div className="bento">
-        {/* HERO — blob viz */}
         <section className="bento-card bento-hero">
           <p className="card-title">Spending this {unitWord}</p>
           <div className="blob-stage">
@@ -112,13 +110,12 @@ function Dashboard() {
             <div className="chip"><span className="chip-label">Avg / {unitWord}</span><span className="chip-val">{avgSpent !== null ? formatMoney(avgSpent) : '—'}</span></div>
             <div className="chip"><span className="chip-label">Biggest</span><span className="chip-val">{biggest ? formatMoney(biggest.amount) : '—'}</span></div>
             <div className="chip" title="Estimated total spend by the end of this period, based on your pace so far. A rough run-rate, not a guarantee.">
-  <span className="chip-label">Projected <span className="est-badge">est.</span></span>
-  <span className={`chip-val ${projectionOver ? 'neg' : ''}`}>{projected > 0 ? formatMoney(projected) : '—'}</span>
-</div>
+              <span className="chip-label">Projected <span className="est-badge">est.</span></span>
+              <span className={`chip-val ${projectionOver ? 'neg' : ''}`}>{projected > 0 ? formatMoney(projected) : '—'}</span>
+            </div>
           </div>
         </section>
 
-        {/* DARK accent card — saved + mini trend */}
         <section className="bento-card bento-dark">
           <p className="dark-label">Saved this {unitWord}</p>
           {curIncome > 0 ? (
@@ -137,7 +134,6 @@ function Dashboard() {
           <p className="dark-foot">spending, last 6 {unitWord}s</p>
         </section>
 
-        {/* GAUGE — budget used */}
         <section className="bento-card bento-gauge">
           <p className="card-title">Budget used</p>
           <div className="gauge-wrap">
@@ -162,7 +158,6 @@ function Dashboard() {
           )}
         </section>
 
-        {/* CATEGORIES — segmented bars */}
         <section className="bento-card bento-cats">
           <p className="card-title">Top categories</p>
           {cats.length === 0 ? (
@@ -187,7 +182,6 @@ function Dashboard() {
           )}
         </section>
 
-        {/* RECENT — full width */}
         <section className="bento-card bento-recent">
           <p className="card-title">Recent transactions</p>
           {recent.length === 0 ? (

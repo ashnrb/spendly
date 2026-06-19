@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react';
 import { useSettings } from '../SettingsContext';
 import { getPeriod, shiftPeriod, inPeriod, periodLabel, toInputDate } from '../periods';
 
+const API = import.meta.env.VITE_API_URL;
 const PALETTE = ['#0c7a54', '#1f9e6e', '#5cb88f', '#caa53d', '#d2784a', '#4c6ef5', '#8a6fc4'];
 
 function ExpenseTracker() {
   const { defaultPeriod } = useSettings();
-  const periodType = defaultPeriod; // driven by Profile setting
+  const periodType = defaultPeriod;
 
   const [expenses, setExpenses] = useState([]);
   const [income, setIncome] = useState([]);
@@ -19,24 +20,22 @@ function ExpenseTracker() {
   const [summaryView, setSummaryView] = useState('bars');
   const [sortBy, setSortBy] = useState('newest');
   const [refDate, setRefDate] = useState(new Date());
-
   const [editingIncome, setEditingIncome] = useState(false);
   const [incomeInput, setIncomeInput] = useState('');
-
-  const [pendingDelete, setPendingDelete] = useState(null); // expense awaiting delete confirmation
+  const [pendingDelete, setPendingDelete] = useState(null);
 
   useEffect(() => { fetchExpenses(); fetchIncome(); }, []);
   useEffect(() => { setEditingIncome(false); }, [periodType, refDate]);
 
   function fetchExpenses() {
-    fetch('http://localhost:5000/api/expenses')
+    fetch(`${API}/api/expenses`)
       .then((res) => res.json())
       .then((data) => setExpenses(data))
       .catch((err) => console.error('Error fetching expenses:', err));
   }
 
   function fetchIncome() {
-    fetch('http://localhost:5000/api/income')
+    fetch(`${API}/api/income`)
       .then((res) => res.json())
       .then((data) => setIncome(data))
       .catch((err) => console.error('Error fetching income:', err));
@@ -44,7 +43,7 @@ function ExpenseTracker() {
 
   function handleAdd() {
     if (!amount || !category) { alert('Amount and category are required'); return; }
-    fetch('http://localhost:5000/api/expenses', {
+    fetch(`${API}/api/expenses`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ amount, category, description, date }),
@@ -62,7 +61,7 @@ function ExpenseTracker() {
   function cancelDelete() { setPendingDelete(null); }
 
   function confirmDelete() {
-    fetch(`http://localhost:5000/api/expenses/${pendingDelete.id}`, { method: 'DELETE' })
+    fetch(`${API}/api/expenses/${pendingDelete.id}`, { method: 'DELETE' })
       .then((res) => res.json())
       .then(() => { fetchExpenses(); setPendingDelete(null); })
       .catch((err) => console.error('Error deleting expense:', err));
@@ -75,7 +74,7 @@ function ExpenseTracker() {
   function cancelEdit() { setEditingId(null); }
 
   function handleUpdate(id) {
-    fetch(`http://localhost:5000/api/expenses/${id}`, {
+    fetch(`${API}/api/expenses/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(editValues),
@@ -83,6 +82,17 @@ function ExpenseTracker() {
       .then((res) => res.json())
       .then(() => { fetchExpenses(); setEditingId(null); })
       .catch((err) => console.error('Error updating expense:', err));
+  }
+
+  function saveIncome() {
+    fetch(`${API}/api/income`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ period_type: periodType, period_start: periodStartKey, amount: incomeInput || 0 }),
+    })
+      .then((res) => res.json())
+      .then(() => { fetchIncome(); setEditingIncome(false); })
+      .catch((err) => console.error('Error saving income:', err));
   }
 
   function formatDate(iso) {
@@ -104,17 +114,6 @@ function ExpenseTracker() {
   function startEditIncome() {
     setIncomeInput(incomeSet ? String(incomeAmount) : '');
     setEditingIncome(true);
-  }
-
-  function saveIncome() {
-    fetch('http://localhost:5000/api/income', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ period_type: periodType, period_start: periodStartKey, amount: incomeInput || 0 }),
-    })
-      .then((res) => res.json())
-      .then(() => { fetchIncome(); setEditingIncome(false); })
-      .catch((err) => console.error('Error saving income:', err));
   }
 
   const periodExpenses = expenses.filter((e) => inPeriod(e.date_added, period));
@@ -158,7 +157,6 @@ function ExpenseTracker() {
         <h1 className="title">Where your money goes</h1>
       </header>
 
-      {/* Period navigation (type is set in Profile) */}
       <div className="period-bar">
         <div className="period-nav">
           <button className="nav-btn" onClick={goPrev}>‹</button>
@@ -169,7 +167,6 @@ function ExpenseTracker() {
         </div>
       </div>
 
-      {/* Income / spent / saved */}
       <div className="stats">
         <div className="stat-card">
           <div className="stat-label">Income</div>
@@ -201,7 +198,6 @@ function ExpenseTracker() {
         </div>
       </div>
 
-      {/* Add form */}
       <div className="card">
         <p className="card-title">Add an expense</p>
         <div className="form-row">
@@ -213,7 +209,6 @@ function ExpenseTracker() {
         </div>
       </div>
 
-      {/* Expense list */}
       <div className="list-header">
         <p className="card-title">Expenses</p>
         <select className="sort-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
@@ -259,7 +254,6 @@ function ExpenseTracker() {
         </ul>
       )}
 
-      {/* Category summary */}
       <div className="card">
         <div className="card-head">
           <p className="card-title">Summary by category</p>
@@ -312,7 +306,6 @@ function ExpenseTracker() {
         )}
       </div>
 
-      {/* Delete confirmation modal */}
       {pendingDelete && (
         <div className="modal-overlay" onClick={cancelDelete}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>

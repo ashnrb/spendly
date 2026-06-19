@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 
 const SettingsContext = createContext(null);
+const API = import.meta.env.VITE_API_URL;
 
 const CURRENCIES = { AUD: '$', USD: '$', EUR: '€', GBP: '£', INR: '₹', JPY: '¥' };
 
@@ -10,7 +11,6 @@ export function SettingsProvider({ children }) {
   const [currency, setCurrency] = useState('AUD');
   const [loaded, setLoaded] = useState(false);
 
-  // Theme stays in localStorage — applied instantly on load, no flash
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
 
   useEffect(() => {
@@ -18,9 +18,8 @@ export function SettingsProvider({ children }) {
     localStorage.setItem('theme', theme);
   }, [theme]);
 
-  // Load DB-backed settings once
   useEffect(() => {
-    fetch('http://localhost:5000/api/settings')
+    fetch(`${API}/api/settings`)
       .then((res) => res.json())
       .then((data) => {
         setName(data.name || '');
@@ -40,7 +39,7 @@ export function SettingsProvider({ children }) {
     setName(payload.name);
     setDefaultPeriod(payload.default_period);
     setCurrency(payload.currency);
-    return fetch('http://localhost:5000/api/settings', {
+    return fetch(`${API}/api/settings`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
