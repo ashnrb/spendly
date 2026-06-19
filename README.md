@@ -5,7 +5,7 @@ A full-stack personal expense tracker built around **spending periods**. Log exp
 Built with React, Express, and MySQL.
 
 <!-- Add a live link here once deployed -->
-**Live demo:** _coming soon_
+**Live demo:** [spendly-ruby.vercel.app](https://spendly-ruby.vercel.app)
 
 <!-- Replace with a real screenshot/GIF once you have one -->
 ![Spendly dashboard](SS/Dashboard.png)
