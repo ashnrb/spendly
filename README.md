@@ -8,7 +8,7 @@ Built with React, Express, and MySQL.
 **Live demo:** _coming soon_
 
 <!-- Replace with a real screenshot/GIF once you have one -->
-![Spendly dashboard](docs/dashboard.png)
+![Spendly dashboard](SS/Dashboard.png)
 
 ---
 
@@ -22,6 +22,13 @@ Built with React, Express, and MySQL.
 - **Profile / settings** — name, default period, and currency, all persisted to the database; plus a danger zone to clear all data.
 - **Light & dark themes** — a theme toggle with an animated WebGL background, persisted across sessions.
 
+---
+## Screens
+ 
+**Expense Tracker** — log, edit, and delete expenses within the selected period, with income, spending, and savings at a glance.
+ 
+![Spendly expense tracker](SS/Tracker.png)
+ 
 ---
 
 ## Tech stack
