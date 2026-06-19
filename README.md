@@ -23,6 +23,13 @@ Built with React, Express, and MySQL.
 - **Light & dark themes** — a theme toggle with an animated WebGL background, persisted across sessions.
 
 ---
+## Screens
+ 
+**Expense Tracker** — log, edit, and delete expenses within the selected period, with income, spending, and savings at a glance.
+ 
+![Spendly expense tracker](SS/Tracker.png)
+ 
+---
 
 ## Tech stack
 
